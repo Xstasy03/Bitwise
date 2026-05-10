@@ -71,7 +71,7 @@ void BitManipulationLab()
         string bitStatus = IsBitOn(bitfield, currentBit) ? "Bit Status: On" : "Bit Status: Off";
         string bitValue = "Bitfield Value: " + to_string(bitfield);
 
-        // Build bits string using while loop
+        // Build bits string - always show all 32 bits
         string bitsStr = "Bits: ";
         int i = 31;
         while (i >= 0)
@@ -80,7 +80,7 @@ void BitManipulationLab()
             i--;
         }
 
-        // Build ^ indicator using while loop
+        // Build ^ indicator - always 32 bits
         string indicator = "      ";
         i = 31;
         while (i >= 0)
@@ -98,7 +98,7 @@ void BitManipulationLab()
             "    == Controls ==",
             "",
             "  I : Turn On        Q : Shift Left",
-            "  0 : Turn Off       E : Shift Right",
+            "  O : Turn Off       E : Shift Right",
             "  Spc : Toggle       <- : Move Left",
             "  N : Negate         -> : Move Right",
             "",
@@ -115,7 +115,7 @@ void BitManipulationLab()
 
         if (input == 27) break;
         if (input == 'i' || input == 'I') TurnOn(bitfield, currentBit);
-        if (input == '0') TurnOff(bitfield, currentBit);
+        if (input == 'o') TurnOff(bitfield, currentBit);
         if (input == ' ') Toggle(bitfield, currentBit);
         if (input == 'n' || input == 'N') Negate(bitfield);
         if (input == 'q' || input == 'Q') LeftShift(bitfield);
@@ -155,30 +155,37 @@ void BitManipulationLab()
 
 void HexManipulationLab()
 {
-    int bitfield = 182;
+    int bitfield = 16711935;
     int currentBit = 0;
     char input;
 
     do
     {
         string bitStatus = IsBitOn(bitfield, currentBit) ? "Bit Status: On" : "Bit Status: Off";
-        string bitValue = "Hex Field Value: " + to_string(bitfield);
 
-        // Build hex string manually without std::hex or std::stringstream
+        // Build hex string manually - trim leading zeros, keep at least one digit
         string hexStr = "";
         unsigned int temp = (unsigned int)bitfield;
+        bool leading = true;
         int i = 7;
         while (i >= 0)
         {
             int nibble = (temp >> (i * 4)) & 0xF;
+            if (leading && nibble == 0 && i != 0)
+            {
+                i--;
+                continue;
+            }
+            leading = false;
             if (nibble < 10)
                 hexStr += (char)('0' + nibble);
             else
                 hexStr += (char)('A' + nibble - 10);
             i--;
         }
+        string bitValue = "Hex Field Value: 0x" + hexStr;
 
-        // Build bits string
+        // Build bits string - always show all 32 bits
         string bitsStr = "Bits: ";
         i = 31;
         while (i >= 0)
@@ -187,7 +194,7 @@ void HexManipulationLab()
             i--;
         }
 
-        // Build ^ indicator
+        // Build ^ indicator - always 32 bits
         string indicator = "      ";
         i = 31;
         while (i >= 0)
@@ -262,7 +269,7 @@ void HexManipulationLab()
 
 void OctalManipulationLab()
 {
-    int bitfield = 24;
+    int bitfield = 16711935;
     int currentBit = 0;
     char input;
 
@@ -270,21 +277,36 @@ void OctalManipulationLab()
     {
         string bitStatus = IsBitOn(bitfield, currentBit) ? "Bit Status: On" : "Bit Status: Off";
 
-        // Build octal string manually - every 3 bits is one octal digit
-        // handle bit 31 alone, then groups of 3 from bit 30 down to 0
+        // Build octal string manually - trim leading zeros
         string octStr = "";
         unsigned int temp = (unsigned int)bitfield;
-        octStr += (char)('0' + ((temp >> 31) & 0x1));
-        int i = 30;
+        bool leading = true;
+
+        int firstGroup = (temp >> 30) & 0x3;
+        if (firstGroup != 0)
+        {
+            octStr += (char)('0' + firstGroup);
+            leading = false;
+        }
+
+        int i = 29;
         while (i >= 0)
         {
             int group = (temp >> (i - 2)) & 0x7;
+            if (leading && group == 0 && i != 2)
+            {
+                i -= 3;
+                continue;
+            }
+            leading = false;
             octStr += (char)('0' + group);
             i -= 3;
         }
+
+        if (octStr.empty()) octStr = "0";
         string bitValue = "Oct Field Value: " + octStr;
 
-        // Build bits string
+        // Build bits string - always show all 32 bits
         string bitsStr = "Bits: ";
         i = 31;
         while (i >= 0)
@@ -293,7 +315,7 @@ void OctalManipulationLab()
             i--;
         }
 
-        // Build ^ indicator
+        // Build ^ indicator - always 32 bits
         string indicator = "      ";
         i = 31;
         while (i >= 0)
