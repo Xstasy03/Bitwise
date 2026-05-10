@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Bitwise/Bitwise.vcxproj" Id="64500e8f-0058-49a2-bdb4-6503d6acd8f1" />
+</Solution>
